@@ -1,3 +1,4 @@
+// src/components/TaskItem.tsx
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { PlannerTask } from '../types/planner';
@@ -10,12 +11,25 @@ interface TaskItemProps {
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, onPress }) => {
-  const statusColor =
-    task.status === 'done'
-      ? colors.success
-      : task.status === 'in_progress'
-      ? colors.warning
-      : colors.danger;
+  let statusColor = colors.danger;
+
+  switch (task.status) {
+    case 'open':
+      statusColor = colors.primaryMedium;
+      break;
+    case 'in_progress':
+      statusColor = colors.primary;
+      break;
+    case 'pending':
+      statusColor = colors.danger;
+      break;
+    case 'completed':
+    case 'done': // caso algum registro antigo ainda use "done"
+      statusColor = colors.success; // VERDE
+      break;
+    default:
+      statusColor = colors.danger;
+  }
 
   return (
     <TouchableOpacity
@@ -39,7 +53,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onPress }) => {
 
 const styles = StyleSheet.create({
   touchable: {
-    marginVertical: 8, // espaçamento real entre os cards
+    marginVertical: 8, // espaçamento entre os cards
   },
   container: {
     flexDirection: 'row',
