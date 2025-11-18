@@ -1,3 +1,4 @@
+// src/screens/Profile/ProfileScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/colors';
 import { fonts } from '../../styles/fonts';
 import { metrics } from '../../styles/metrics';
+import { Ionicons } from '@expo/vector-icons';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -14,35 +16,88 @@ const ProfileScreen: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<Nav>();
 
+  const initials =
+    user?.name
+      ?.split(' ')
+      .filter(Boolean)
+      .map(part => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'SP';
+
+  const avatarBg = user?.avatarColor || colors.surface;
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>Perfil</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Name</Text>
-        <Text style={styles.value}>{user?.name}</Text>
-
-        <Text style={[styles.label, { marginTop: 12 }]}>E-mail</Text>
-        <Text style={styles.value}>{user?.email}</Text>
+      <View style={styles.headerCard}>
+        <View style={[styles.avatar, { backgroundColor: avatarBg }]}>
+          <Text style={styles.avatarInitials}>{initials}</Text>
+        </View>
+        <View style={styles.headerInfo}>
+          <Text style={styles.name}>{user?.name ?? 'Usuário SysPlanner'}</Text>
+          <Text style={styles.email}>
+            {user?.email ?? 'sem e-mail cadastrado'}
+          </Text>
+          <Text style={styles.helperText}>
+            Estas informações são usadas pelo SysPlanner para personalizar sua
+            experiência e exibir seus dados nas telas de planejamento.
+          </Text>
+        </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.secondaryButton}
-        onPress={() => navigation.navigate('EditProfile')}
-      >
-        <Text style={styles.secondaryButtonText}>Edit profile</Text>
-      </TouchableOpacity>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Sobre você</Text>
 
-      <TouchableOpacity
-        style={styles.secondaryButton}
-        onPress={() => navigation.navigate('ChangePhoto')}
-      >
-        <Text style={styles.secondaryButtonText}>Change photo</Text>
-      </TouchableOpacity>
+        <View style={styles.aboutCard}>
+          <Text style={styles.aboutText}>
+            {user?.about && user.about.trim().length > 0
+              ? user.about
+              : 'Adicione uma breve descrição sobre você em "Editar dados do perfil".'}
+          </Text>
+        </View>
+      </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Configurações de conta</Text>
+
+        <TouchableOpacity
+          style={styles.listItem}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <View style={styles.listItemLeft}>
+            <Ionicons name="person-outline" size={20} color={colors.text} />
+            <Text style={styles.listItemText}>Editar dados do perfil</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.listItem}
+          onPress={() => navigation.navigate('ChangePhoto')}
+        >
+          <View style={styles.listItemLeft}>
+            <Ionicons name="color-palette-outline" size={20} color={colors.text} />
+            <Text style={styles.listItemText}>Personalizar avatar</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Sessão</Text>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+          <Ionicons
+            name="log-out-outline"
+            size={20}
+            color="#FFFFFF"
+            style={{ marginRight: 6 }}
+          />
+          <Text style={styles.logoutText}>Sair do SysPlanner</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -60,35 +115,87 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
-  card: {
+  headerCard: {
+    flexDirection: 'row',
     backgroundColor: colors.card,
-    borderRadius: metrics.radiusMd,
+    borderRadius: metrics.radiusLg,
     padding: metrics.paddingMd,
     marginBottom: 24,
+    alignItems: 'center',
   },
-  label: {
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primaryMedium,
+    marginRight: 12,
+  },
+  avatarInitials: {
+    fontFamily: fonts.bold,
+    fontSize: fonts.sizes.lg,
+    color: colors.text,
+  },
+  headerInfo: {
+    flex: 1,
+  },
+  name: {
+    fontFamily: fonts.medium,
+    fontSize: fonts.sizes.lg,
+    color: colors.text,
+  },
+  email: {
     fontFamily: fonts.regular,
     fontSize: fonts.sizes.sm,
     color: colors.textMuted,
+    marginTop: 2,
   },
-  value: {
+  helperText: {
+    fontFamily: fonts.regular,
+    fontSize: fonts.sizes.xs,
+    color: colors.textMuted,
+    marginTop: 6,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
     fontFamily: fonts.medium,
-    fontSize: fonts.sizes.md,
-    color: colors.text,
+    fontSize: fonts.sizes.sm,
+    color: colors.textMuted,
+    marginBottom: 8,
   },
-  secondaryButton: {
-    height: 44,
-    borderRadius: metrics.radiusMd,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
+  aboutCard: {
     backgroundColor: colors.card,
+    borderRadius: metrics.radiusMd,
+    padding: metrics.paddingMd,
   },
-  secondaryButtonText: {
-    fontFamily: fonts.medium,
+  aboutText: {
+    fontFamily: fonts.regular,
+    fontSize: fonts.sizes.sm,
     color: colors.text,
+  },
+  listItem: {
+    backgroundColor: colors.card,
+    borderRadius: metrics.radiusMd,
+    paddingHorizontal: metrics.paddingMd,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  listItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  listItemText: {
+    fontFamily: fonts.medium,
+    fontSize: fonts.sizes.sm,
+    color: colors.text,
+    marginLeft: 8,
   },
   logoutButton: {
     height: 48,
@@ -96,11 +203,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.danger,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16,
+    flexDirection: 'row',
   },
   logoutText: {
     color: '#fff',
     fontFamily: fonts.medium,
+    fontSize: fonts.sizes.sm,
   },
 });
 
