@@ -17,18 +17,39 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Signin'>;
 
 const SignInScreen: React.FC<Props> = ({ navigation }) => {
   const { signIn } = useAuth();
-  const [email, setEmail] = useState('user@sysplanner.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  function validate(): boolean {
+    if (!email.trim() || !password.trim()) {
+      setError('Preencha e-mail e senha para entrar.');
+      return false;
+    }
+
+    // validação simples de e-mail
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Informe um e-mail válido.');
+      return false;
+    }
+
+    return true;
+  }
+
   async function handleLogin() {
+    if (!validate()) {
+      return;
+    }
+
     try {
       setError(null);
       setLoading(true);
-      await signIn({ email, password });
+      // AuthContext já cuida de salvar o usuário em AsyncStorage
+      await signIn(email.trim(), password);
     } catch (e: any) {
-      setError(e.message ?? 'Login failed');
+      setError(e?.message ?? 'Não foi possível entrar. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -36,47 +57,62 @@ const SignInScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to SysPlanner</Text>
-      <Text style={styles.subtitle}>
-        Plan your study, work and personal life in a single place.
-      </Text>
-
-      {error && <Text style={styles.error}>{error}</Text>}
-
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.7 }]}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? 'Entering...' : 'Login'}
+      <View style={styles.header}>
+        <Text style={styles.appName}>SysPlanner</Text>
+        <Text style={styles.subtitle}>
+          Organize estudos, trabalho e vida pessoal em um único lugar.
         </Text>
-      </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity
-        style={styles.linkContainer}
-        onPress={() => navigation.navigate('SignUp')}
-      >
-        <Text style={styles.linkText}>
-          Do not have an account? Register here.
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Entrar</Text>
+        <Text style={styles.cardSubtitle}>
+          Acesse sua rotina e acompanhe suas tarefas do dia.
         </Text>
-      </TouchableOpacity>
+
+        {error && <Text style={styles.error}>{error}</Text>}
+
+        <Text style={styles.label}>E-mail</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="seuemail@exemplo.com"
+          placeholderTextColor={colors.textMuted}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+
+        <Text style={styles.label}>Senha</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Digite sua senha"
+          placeholderTextColor={colors.textMuted}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity
+          style={[styles.button, loading && { opacity: 0.7 }]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.linkContainer}
+          onPress={() => navigation.navigate('SignUp')}
+        >
+          <Text style={styles.linkText}>
+            Não tem uma conta?{' '}
+            <Text style={styles.linkTextHighlight}>Criar cadastro</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -88,21 +124,53 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'center',
   },
-  title: {
+  header: {
+    marginBottom: 24,
+  },
+  appName: {
     fontFamily: fonts.bold,
     fontSize: fonts.sizes.xxl,
-    color: colors.primary,
-    marginBottom: 8,
+    color: colors.primaryMedium,
+    marginBottom: 4,
   },
   subtitle: {
     fontFamily: fonts.regular,
     fontSize: fonts.sizes.sm,
     color: colors.textMuted,
-    marginBottom: 24,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: metrics.radiusLg,
+    padding: metrics.paddingLg,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  cardTitle: {
+    fontFamily: fonts.bold,
+    fontSize: fonts.sizes.lg,
+    color: colors.text,
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    fontFamily: fonts.regular,
+    fontSize: fonts.sizes.xs,
+    color: colors.textMuted,
+    marginBottom: 16,
   },
   error: {
     color: colors.danger,
+    fontFamily: fonts.regular,
+    fontSize: fonts.sizes.xs,
     marginBottom: 8,
+  },
+  label: {
+    fontFamily: fonts.medium,
+    fontSize: fonts.sizes.sm,
+    color: colors.text,
+    marginBottom: 4,
   },
   input: {
     height: 48,
@@ -111,12 +179,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     paddingHorizontal: metrics.paddingMd,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
+    color: colors.text,
   },
   button: {
     height: 48,
     borderRadius: metrics.radiusMd,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMedium,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -131,7 +200,12 @@ const styles = StyleSheet.create({
   },
   linkText: {
     textAlign: 'center',
-    color: colors.primaryDark,
+    color: colors.textMuted,
+    fontFamily: fonts.regular,
+    fontSize: fonts.sizes.sm,
+  },
+  linkTextHighlight: {
+    color: colors.primaryMedium,
     fontFamily: fonts.medium,
   },
 });
