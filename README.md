@@ -16,6 +16,9 @@ Link Youtube - https://youtu.be/Z71CfQin3bU
 
 QRCODE - 
 
+---
+Hash ultimo commit fb326c8eb7df82616717aa6366418cfdd7ce8066
+---
 
 <img width="354" height="432" alt="QRCODE" src="https://github.com/user-attachments/assets/e2a90c0d-277b-44a2-a3fb-9f3f8a2ee743" />
 
