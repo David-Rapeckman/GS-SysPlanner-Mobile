@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "SysTrack",
-    "slug": "systrack",
+    "name": "SysPlanner",
+    "slug": "sysplanner",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/logo.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -25,7 +25,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.rapeckman.systrack"
@@ -35,11 +35,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b5957cc6-6ea8-4180-9278-80ef3e2e2ae2"
+        "projectId": "e379a1ea-3c36-4a03-afc2-c83d0673d760"
       }
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "owner": "rapeckman"
   }
 }
