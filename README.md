@@ -10,6 +10,17 @@ A proposta é ajudar estudantes e profissionais a organizarem **estudos, trabalh
 
 ---
 
+Link Youtube - https://youtu.be/Z71CfQin3bU
+
+---
+
+QRCODE - 
+
+
+<img width="354" height="432" alt="QRCODE" src="https://github.com/user-attachments/assets/e2a90c0d-277b-44a2-a3fb-9f3f8a2ee743" />
+
+
+---
 ## 🧩 Funcionalidades principais
 
 - **Tela de Splash com animação**
